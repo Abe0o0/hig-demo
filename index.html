@@ -18,536 +18,451 @@
 <meta name="twitter:title" content="HIG — Linking Producer to Markets">
 <meta name="twitter:description" content="Direct carrier contracts — never a downline. Level commissions, 3–9 month advances with zero fees. National IMO, Fort Lauderdale FL.">
 <meta name="twitter:image" content="https://abe0o0.github.io/hig-demo/img/og-card.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='14' height='14' x='1' y='1' fill='%231fb6e8'/%3E%3Crect width='14' height='14' x='17' y='1' fill='%2316344a'/%3E%3Crect width='14' height='14' x='1' y='17' fill='%235a7286'/%3E%3Crect width='14' height='14' x='17' y='17' fill='%237fe0ff'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='14' height='14' x='1' y='1' fill='%23e08a3c'/%3E%3Crect width='14' height='14' x='17' y='1' fill='%231f3d2b'/%3E%3Crect width='14' height='14' x='1' y='17' fill='%23151310'/%3E%3Crect width='14' height='14' x='17' y='17' fill='%23d9e64f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/*
+  HIG v2 "The Agent Operating System"
+  Terminal-reference restyle: amber sunset photography, blush statement panels,
+  black wireframe panels, forest-green statement moment, one yellow-green accent.
+  Palette lock: amber (photo) / blush #f2ded6 / off-black #151310 / forest #1f3d2b / accent #d9e64f
+*/
 :root{
-  --bg:#06090e;
-  --bg2:#0a1018;
-  --ink:#e8eef4;
-  --dim:#8fa0b0;
-  --faint:#42525f;
-  --cyan:#1fb6e8;
-  --cyan-hi:#7fe0ff;
-  --navy:#16344a;
-  --line:rgba(143,160,176,.14);
-  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  --sans:'Archivo',-apple-system,'Helvetica Neue',Arial,sans-serif;
-  --disp:'Anton','Archivo Black','Arial Narrow',sans-serif;
+  --blush:#f2ded6;
+  --blush-2:#e9cbbe;
+  --blush-3:#dfb6a3;
+  --black:#151310;
+  --black-2:#1c1916;
+  --green:#1f3d2b;
+  --accent:#d9e64f;
+  --accent-ink:#1c2008;
+  --ink:#241e19;
+  --ink-soft:#5d534b;
+  --paper-ink:#efe6df;
+  --paper-dim:#a99e94;
+  --sans:'Hanken Grotesk',-apple-system,'Helvetica Neue',Arial,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
-  background:var(--bg);color:var(--ink);font-family:var(--sans);
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
-::selection{background:var(--cyan);color:#03121c}
+body{background:var(--black);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--accent);color:var(--accent-ink)}
+img{display:block;max-width:100%}
+h1,h2,h3{font-weight:500;letter-spacing:-.025em}
 
-/* ---------- ambient field ---------- */
-.field{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(900px 600px at 80% -5%, rgba(31,182,232,.10), transparent 60%),
-    radial-gradient(800px 700px at 8% 45%, rgba(22,52,74,.45), transparent 65%),
-    radial-gradient(700px 600px at 90% 95%, rgba(31,182,232,.07), transparent 60%);
-}
-.grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");}
-
-/* ---------- the wire ---------- */
-#wireLayer{position:absolute;top:0;left:0;width:100%;z-index:1;pointer-events:none;overflow:visible}
-#wireSvg{display:block;width:100%}
-#wireGhost{fill:none;stroke:rgba(143,160,176,.10);stroke-width:2;stroke-dasharray:3 9}
-#wirePath{fill:none;stroke:url(#wireGrad);stroke-width:3;stroke-linecap:round;
-  filter:drop-shadow(0 0 6px rgba(31,182,232,.65)) drop-shadow(0 0 18px rgba(31,182,232,.25))}
-#orbLayer{position:absolute;top:0;left:0;width:100%;height:0;z-index:6;pointer-events:none;overflow:visible}
-#orb{position:absolute;top:0;left:0;width:58px;height:58px;border-radius:50%;
-  margin:-29px 0 0 -29px;will-change:transform;
-  background:radial-gradient(circle at 34% 28%, #d9f5ff 0%, #7fe0ff 18%, #1fb6e8 48%, #0b4a68 82%, #062536 100%);
-  box-shadow:0 0 22px rgba(31,182,232,.75),0 0 70px rgba(31,182,232,.30),inset -8px -10px 22px rgba(3,18,28,.55);
-}
-#orb::after{content:"";position:absolute;inset:-9px;border-radius:50%;
-  border:1px dashed rgba(127,224,255,.4);animation:spin 14s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ---------- nav ---------- */
-nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;
-  justify-content:space-between;padding:18px 4vw;
-  background:linear-gradient(rgba(6,9,14,.88),rgba(6,9,14,.55) 70%,transparent);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
-.brand .sq{display:grid;grid-template-columns:repeat(2,8px);grid-auto-rows:8px;gap:2px}
-.brand .sq i{background:var(--cyan)}
-.brand .sq i:nth-child(2){background:var(--navy)}
-.brand .sq i:nth-child(3){background:#5a7286}
-.brand .sq i:nth-child(4){background:var(--cyan-hi)}
-.brand b{font-family:var(--disp);font-size:22px;letter-spacing:.06em}
-.brand small{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.18em;display:block;margin-top:1px}
-.navlinks{display:flex;gap:30px;align-items:center}
-.navlinks a{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--dim);
-  text-decoration:none;text-transform:uppercase;transition:color .2s}
-.navlinks a:hover{color:var(--cyan-hi)}
-#linkPct{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.12em;min-width:86px;text-align:right}
-a.cta{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  background:var(--cyan);color:#03121c;padding:12px 22px;text-decoration:none;font-weight:500;
-  transition:transform .15s,box-shadow .2s;white-space:nowrap}
-a.cta:hover{box-shadow:0 0 24px rgba(31,182,232,.5);color:#03121c}
-a.cta:active{transform:scale(.98)}
-a.cta.ghost{background:transparent;color:var(--cyan-hi);border:1px solid rgba(31,182,232,.5)}
-a.cta.ghost:hover{border-color:var(--cyan-hi);color:var(--cyan-hi)}
-
-/* ---------- shared ---------- */
-main{position:relative;z-index:2}
-section{position:relative;padding:18vh 6vw;max-width:1500px;margin:0 auto}
-.kick{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--cyan);margin-bottom:26px}
-.kick::before{content:"//";color:var(--faint);margin-right:10px}
-h1,h2{font-family:var(--disp);font-weight:400;text-transform:uppercase;line-height:.95;letter-spacing:.005em}
-.lede{color:var(--dim);font-size:clamp(16px,1.35vw,19px);line-height:1.65;max-width:58ch}
-.rev{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+/* ---------- reveal ---------- */
+.rev{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
 .rev.vis{opacity:1;transform:none}
-.hud{position:absolute;font-family:var(--mono);font-size:10px;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--dim);line-height:1.9;z-index:3}
-.hud b{color:var(--cyan-hi);font-weight:500;display:block}
-.hud::before{content:"";display:block;width:34px;height:1px;background:var(--cyan);margin-bottom:8px;opacity:.7}
-.wpt{position:absolute;width:1px;height:1px}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rev{opacity:1;transform:none;transition:none}
+  .hero-img{transform:none!important}
+}
+
+/* ---------- pill nav ---------- */
+nav{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:50;
+  display:flex;align-items:center;gap:6px;padding:8px 8px 8px 22px;border-radius:999px;
+  background:rgba(21,19,16,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(242,222,214,.16);white-space:nowrap}
+nav .brand{font-weight:700;font-size:17px;letter-spacing:.02em;color:var(--paper-ink);text-decoration:none;margin-right:14px}
+nav .brand span{font-weight:400;color:var(--paper-dim);font-size:11px;letter-spacing:.14em;margin-left:8px;text-transform:uppercase}
+nav .links{display:flex;gap:4px;margin-right:10px}
+nav .links a{color:var(--paper-ink);opacity:.78;text-decoration:none;font-size:13.5px;font-weight:500;
+  padding:8px 13px;border-radius:999px;transition:opacity .2s,background .2s}
+nav .links a:hover{opacity:1;background:rgba(242,222,214,.1)}
+.cta{display:inline-block;background:var(--accent);color:var(--accent-ink);text-decoration:none;
+  font-weight:600;font-size:13.5px;padding:10px 20px;border-radius:999px;border:none;cursor:pointer;
+  transition:transform .15s,filter .2s;letter-spacing:.01em}
+.cta:hover{filter:brightness(1.06)}
+.cta:active{transform:scale(.97)}
 
 /* ---------- hero ---------- */
-#hero{min-height:100dvh;display:flex;flex-direction:column;justify-content:center;padding-top:14vh}
-#hero h1{font-size:clamp(52px,9.6vw,168px)}
-#hero h1 .hollow{color:transparent;-webkit-text-stroke:2px var(--cyan);}
-#hero .lede{margin-top:34px}
-.heroCtas{display:flex;gap:16px;margin-top:42px;flex-wrap:wrap}
-.headset{position:absolute;right:9vw;top:20vh;width:120px;opacity:.95}
-.headset svg{display:block;overflow:visible}
-.headset .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--cyan-hi);
-  text-transform:uppercase;text-align:center;margin-top:12px}
-.headset .lbl span{color:var(--dim);display:block;margin-top:2px}
+#hero{position:relative;min-height:100dvh;display:flex;align-items:flex-end;overflow:hidden}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:72% 38%}
+#hero .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,19,16,.18) 0%,transparent 30%,transparent 55%,rgba(21,19,16,.62) 100%)}
+.hero-inner{position:relative;z-index:2;width:100%;max-width:1340px;margin:0 auto;padding:0 5vw 9vh}
+#hero h1{color:#fbf3ec;font-size:clamp(42px,6.2vw,96px);line-height:1.02;max-width:13ch;text-shadow:0 2px 30px rgba(21,19,16,.35)}
+#hero p{color:rgba(251,243,236,.92);font-size:clamp(16px,1.4vw,19px);line-height:1.55;max-width:44ch;margin-top:22px;text-shadow:0 1px 18px rgba(21,19,16,.4)}
+#hero .cta{margin-top:32px;font-size:15px;padding:14px 28px}
 
-/* ---------- marquee ---------- */
-.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-  overflow:hidden;padding:20px 0;position:relative;z-index:2;background:rgba(6,9,14,.6)}
-.mtrack{display:flex;gap:0;width:max-content;animation:slide 36s linear infinite}
-.mtrack span{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--dim);padding:0 34px;white-space:nowrap}
-.mtrack span::after{content:"●";color:var(--cyan);font-size:8px;margin-left:64px;vertical-align:2px}
-@keyframes slide{to{transform:translateX(-50%)}}
+/* ---------- blush statement panels ---------- */
+.statement{background:var(--blush);color:var(--ink);padding:23vh 6vw;text-align:center}
+.statement .big{font-size:clamp(30px,4.3vw,62px);line-height:1.18;font-weight:500;letter-spacing:-.022em;max-width:24ch;margin:0 auto}
+.statement .big em{font-style:normal;color:#8a4d2e}
 
-/* ---------- big type moments ---------- */
-.bigmoment{text-align:left;padding-top:24vh;padding-bottom:24vh}
-.bigmoment h2{font-size:clamp(58px,11.5vw,200px)}
-.bigmoment h2 .cy{color:var(--cyan)}
-.bigmoment .lede{margin-top:36px}
+/* ---------- black wireframe panels ---------- */
+.wirepanel{background:var(--black);color:var(--paper-ink);padding:16vh 6vw;text-align:center;position:relative;overflow:hidden}
+.wirepanel .wf{max-width:1020px;margin:0 auto}
+.wirepanel .wf svg{width:100%;height:auto;display:block}
+.wirepanel h2{font-size:clamp(34px,4.6vw,68px);line-height:1.08;margin-top:48px}
+.wirepanel .sub{color:var(--paper-dim);font-size:clamp(15px,1.25vw,18px);line-height:1.65;max-width:54ch;margin:22px auto 0}
+.wirepanel .sub b{color:var(--paper-ink);font-weight:600}
 
-/* ---------- stats ---------- */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);margin-top:64px}
-.stat{padding:38px 28px 38px 0;border-bottom:1px solid var(--line)}
-.stat+.stat{padding-left:28px;border-left:1px solid var(--line)}
-.stat b{font-family:var(--disp);font-weight:400;font-size:clamp(38px,4.6vw,76px);display:block;line-height:1;color:var(--ink)}
-.stat b em{font-style:normal;color:var(--cyan)}
-.stat span{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);display:block;margin-top:14px;line-height:1.8}
+/* ---------- stats on blush ---------- */
+#numbers{background:var(--blush);padding:18vh 6vw}
+#numbers .wrap{max-width:1340px;margin:0 auto}
+#numbers h2{font-size:clamp(32px,4vw,58px);line-height:1.08;max-width:18ch}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:64px}
+.stat{border-radius:22px;padding:34px 30px;min-height:230px;display:flex;flex-direction:column;justify-content:space-between}
+.stat b{font-size:clamp(44px,4.6vw,74px);font-weight:600;letter-spacing:-.03em;line-height:1}
+.stat b small{font-size:.42em;font-weight:600;letter-spacing:0}
+.stat span{font-size:14.5px;line-height:1.5;font-weight:500;margin-top:26px}
+.stat.s1{background:var(--blush-2);color:var(--ink)}
+.stat.s2{background:var(--black);color:var(--paper-ink)}
+.stat.s2 span{color:var(--paper-dim)}
+.stat.s3{background:var(--green);color:#eef2e4}
+.stat.s3 span{color:#b9c8ae}
+.stat.s4{background:var(--blush-3);color:var(--ink)}
 
-/* ---------- services ---------- */
-.svc{border-top:1px solid var(--line);margin-top:70px}
-.row{display:grid;grid-template-columns:90px 1fr 1.4fr;gap:30px;padding:40px 0;
-  border-bottom:1px solid var(--line);align-items:baseline;transition:background .25s}
-.row:hover{background:rgba(31,182,232,.035)}
-.row .no{font-family:var(--mono);color:var(--faint);font-size:13px;letter-spacing:.1em}
-.row h3{font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:clamp(20px,2.1vw,30px);letter-spacing:.02em}
-.row p{color:var(--dim);line-height:1.65;font-size:15.5px;max-width:54ch}
+/* ---------- planks (what you get) ---------- */
+#system{background:var(--blush);padding:6vh 0 20vh}
+#system .head{max-width:1340px;margin:0 auto;padding:0 6vw}
+#system h2{font-size:clamp(32px,4vw,58px);line-height:1.08}
+#system .head p{color:var(--ink-soft);font-size:clamp(15px,1.25vw,17.5px);line-height:1.6;max-width:52ch;margin-top:18px}
+.planks{display:flex;gap:14px;margin-top:60px;padding:0 6vw;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.planks::-webkit-scrollbar{display:none}
+.plank{scroll-snap-align:start;flex:0 0 285px;border-radius:140px 140px 26px 26px;
+  min-height:430px;padding:46px 30px 38px;display:flex;flex-direction:column}
+.plank .num{font-size:62px;font-weight:300;letter-spacing:-.04em;line-height:1}
+.plank h3{font-size:21px;font-weight:600;letter-spacing:-.01em;margin-top:auto}
+.plank p{font-size:14.5px;line-height:1.55;margin-top:12px}
+.plank.p1{background:var(--blush-2);color:var(--ink)}.plank.p1 p{color:var(--ink-soft)}
+.plank.p2{background:var(--black);color:var(--paper-ink)}.plank.p2 p{color:var(--paper-dim)}
+.plank.p3{background:var(--blush-3);color:var(--ink)}.plank.p3 p{color:#6b4a38}
+.plank.p4{background:var(--green);color:#eef2e4}.plank.p4 p{color:#b9c8ae}
+.plank.p5{background:#e4c0b0;color:var(--ink)}.plank.p5 p{color:#6b4a38}
+.plank.p6{background:var(--black-2);color:var(--paper-ink)}.plank.p6 p{color:var(--paper-dim)}
 
-/* ---------- quotes ---------- */
-.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
-  border:1px solid var(--line);margin-top:64px}
-.q{background:var(--bg2);padding:42px 34px}
-.q p{color:var(--ink);line-height:1.7;font-size:15.5px}
-.q p::before{content:"“";color:var(--cyan);font-family:var(--disp);font-size:30px;line-height:0;margin-right:4px}
-.q span{display:block;margin-top:26px;font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
-.q span::before{content:"— "}
+/* ---------- green statement ---------- */
+#os{background:var(--green);color:#f2f5ea;padding:26vh 6vw;text-align:center}
+#os .small{font-size:clamp(17px,1.6vw,22px);font-weight:500;color:#b9c8ae}
+#os h2{font-size:clamp(40px,6.4vw,104px);line-height:1.04;margin-top:18px;letter-spacing:-.025em}
+
+/* ---------- giant logotype ---------- */
+#mark{background:var(--blush);padding:20vh 4vw 14vh;text-align:center;overflow:hidden}
+#mark .tag{font-size:clamp(14px,1.3vw,18px);font-weight:500;color:var(--ink-soft)}
+#mark .giant{font-size:clamp(140px,30vw,470px);font-weight:600;letter-spacing:-.045em;line-height:.88;color:var(--ink);margin-top:10px}
+#mark .giant sup{font-size:.09em;font-weight:500;letter-spacing:.08em;vertical-align:super}
+
+/* ---------- quote over night photo ---------- */
+#agents{position:relative;padding:24vh 6vw;overflow:hidden;color:var(--paper-ink)}
+#agents .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 28%}
+#agents .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,19,16,.55),rgba(21,19,16,.78))}
+#agents .wrap{position:relative;z-index:2;max-width:880px;margin:0 auto;text-align:center}
+#agents blockquote{font-size:clamp(24px,2.9vw,42px);line-height:1.3;font-weight:500;letter-spacing:-.015em}
+#agents .who{margin-top:28px;color:var(--paper-dim);font-size:15px;font-weight:500}
+.quoterow{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:11vh;text-align:left}
+.quoterow p{font-size:16px;line-height:1.6;color:rgba(239,230,223,.9)}
+.quoterow span{display:block;margin-top:14px;color:var(--paper-dim);font-size:13.5px;font-weight:500}
 
 /* ---------- faq ---------- */
-.faq{margin-top:60px;border-top:1px solid var(--line)}
-.faq details{border-bottom:1px solid var(--line)}
-.faq summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;
-  padding:30px 6px;font-family:var(--disp);font-weight:400;text-transform:uppercase;
-  font-size:clamp(17px,1.8vw,24px);letter-spacing:.03em;transition:color .2s}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary:hover{color:var(--cyan-hi)}
-.faq summary i{font-family:var(--mono);font-style:normal;color:var(--cyan);font-size:18px;transition:transform .25s}
-.faq details[open] summary i{transform:rotate(45deg)}
-.faq details p{color:var(--dim);line-height:1.7;padding:0 6px 32px;max-width:70ch;font-size:15.5px}
-.faq details p b{color:var(--cyan-hi);font-weight:600}
+#faq{background:var(--blush);padding:18vh 6vw}
+#faq .wrap{max-width:880px;margin:0 auto}
+#faq h2{font-size:clamp(32px,4vw,58px);line-height:1.08;text-align:center}
+.faqlist{margin-top:56px}
+.faqlist details{border-bottom:1px solid rgba(36,30,25,.16)}
+.faqlist details:first-child{border-top:1px solid rgba(36,30,25,.16)}
+.faqlist summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;
+  gap:20px;padding:26px 4px;font-size:clamp(17px,1.7vw,21px);font-weight:600;letter-spacing:-.01em}
+.faqlist summary::-webkit-details-marker{display:none}
+.faqlist summary i{font-style:normal;font-weight:400;font-size:24px;color:#8a4d2e;transition:transform .25s;flex:0 0 auto}
+.faqlist details[open] summary i{transform:rotate(45deg)}
+.faqlist details p{color:var(--ink-soft);line-height:1.65;padding:0 4px 28px;font-size:15.5px;max-width:64ch}
+.faqlist details p b{color:var(--ink);font-weight:600}
 
-/* ---------- contact ---------- */
-#contact{text-align:center;padding-top:26vh;padding-bottom:16vh}
-#contact h2{font-size:clamp(64px,13vw,210px)}
-#contact .lede{margin:36px auto 0}
-.plug{width:90px;margin:54px auto 0}
-.plug .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--cyan-hi);text-transform:uppercase;margin-top:12px}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
-  border:1px solid var(--line);margin-top:70px;text-align:left}
-.card{background:var(--bg2);padding:36px 32px}
-.card span{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:16px}
-.card b{font-size:19px;font-weight:600;letter-spacing:.01em}
-.card a{color:var(--cyan-hi);text-decoration:none}
-.card a:hover{text-decoration:underline}
-#contact .cta{margin-top:60px;font-size:13px;padding:18px 44px}
+/* ---------- closing photo band ---------- */
+#horizon{position:relative;min-height:62vh;display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center}
+#horizon img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#horizon .scrim{position:absolute;inset:0;background:rgba(21,19,16,.36)}
+#horizon h2{position:relative;z-index:2;color:#fbf3ec;font-size:clamp(38px,5.6vw,86px);line-height:1.05;padding:0 6vw;text-shadow:0 2px 28px rgba(21,19,16,.45)}
 
-/* ---------- lead form ---------- */
-.leadform{margin:70px auto 0;max-width:860px;text-align:left;display:grid;
-  grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
-.field{background:var(--bg2);padding:24px 28px;transition:background .2s}
-.field.full{grid-column:1/-1}
-.field label{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--dim);display:block;margin-bottom:10px;transition:color .2s}
-.field input,.field select,.field textarea{width:100%;background:transparent;border:none;outline:none;
-  color:var(--ink);font-family:var(--sans);font-size:16px;padding:2px 0}
-.field textarea{resize:vertical;min-height:58px}
-.field select{appearance:none;-webkit-appearance:none;cursor:pointer}
-.field select option{background:var(--bg2);color:var(--ink)}
-.field:focus-within{background:#0d1622}
-.field:focus-within label{color:var(--cyan-hi)}
-.submitrow{grid-column:1/-1;background:var(--bg2);padding:30px;text-align:center}
-.submitrow .formnote{font-family:var(--mono);font-size:10px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--faint);margin-top:16px}
-button.cta{border:1px solid var(--cyan);cursor:pointer;font-family:var(--mono);
-  font-size:12px;letter-spacing:.18em;text-transform:uppercase;background:var(--cyan);
-  color:#03121c;padding:17px 46px;transition:all .22s}
-button.cta:hover{background:var(--cyan-hi);border-color:var(--cyan-hi);color:#03121c}
-button.cta:active{transform:scale(.98)}
+/* ---------- contact / lead form ---------- */
+#contact{background:var(--blush);padding:14vh 6vw 12vh}
+#contact .wrap{max-width:880px;margin:0 auto}
+#contact h2{font-size:clamp(30px,3.6vw,50px);line-height:1.1;text-align:center}
+#contact .intro{color:var(--ink-soft);font-size:clamp(15px,1.25vw,17.5px);line-height:1.6;max-width:48ch;margin:18px auto 0;text-align:center}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:54px 0 14px}
+.meta .cell{background:#f8ece5;border-radius:18px;padding:22px 24px}
+.meta .cell span{display:block;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8a4d2e;margin-bottom:8px}
+.meta .cell b{font-size:16.5px;font-weight:600}
+.meta .cell a{color:var(--ink);text-decoration:none}
+.meta .cell a:hover{text-decoration:underline}
+.leadform{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fcell{background:#f8ece5;border-radius:18px;padding:18px 24px 16px;transition:box-shadow .2s}
+.fcell.full{grid-column:1/-1}
+.fcell label{display:block;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8a4d2e;margin-bottom:8px}
+.fcell input,.fcell select,.fcell textarea{width:100%;background:transparent;border:none;outline:none;
+  color:var(--ink);font-family:var(--sans);font-size:16.5px;font-weight:500;padding:2px 0}
+.fcell input::placeholder,.fcell textarea::placeholder{color:#a08a7c}
+.fcell textarea{resize:vertical;min-height:56px}
+.fcell select{appearance:none;-webkit-appearance:none;cursor:pointer}
+.fcell:focus-within{box-shadow:inset 0 0 0 2px var(--green)}
+.submitrow{grid-column:1/-1;text-align:center;padding-top:18px}
+.submitrow .cta{font-size:15.5px;padding:16px 42px}
+.submitrow .note{margin-top:16px;font-size:13px;color:var(--ink-soft);font-weight:500}
 
 /* ---------- footer ---------- */
-footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:34px 6vw;
-  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
-footer p{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
-footer p b{color:var(--dim);font-weight:500}
+footer{background:var(--black);color:var(--paper-dim);padding:54px 6vw 46px}
+footer .row{max-width:1340px;margin:0 auto;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:13.5px;line-height:1.6}
+footer b{color:var(--paper-ink);font-weight:600}
+footer .disclaimer{max-width:1340px;margin:26px auto 0;padding-top:22px;border-top:1px solid rgba(239,230,223,.14);
+  font-size:12.5px;line-height:1.6;color:#7d736a}
 
 /* ---------- responsive ---------- */
 @media(max-width:980px){
-  .navlinks a{display:none}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .stat+.stat{padding-left:0;border-left:none}
-  .stat:nth-child(even){padding-left:28px;border-left:1px solid var(--line)}
-  .row{grid-template-columns:50px 1fr;gap:14px}
-  .row p{grid-column:2}
-  .quotes,.cards{grid-template-columns:1fr}
-  .hud{display:none}
-  .headset{display:none}
-  #orb{width:42px;height:42px;margin:-21px 0 0 -21px}
-}
-@media(prefers-reduced-motion:reduce){
-  .mtrack{animation:none}
-  #orb::after{animation:none}
-  .rev{opacity:1;transform:none;transition:none}
-  html{scroll-behavior:auto}
+  nav{left:4vw;right:4vw;transform:none;justify-content:space-between;padding-left:18px}
+  nav .links{display:none}
+  .statgrid{grid-template-columns:1fr 1fr}
+  .quoterow{grid-template-columns:1fr}
+  .meta{grid-template-columns:1fr}
+  .leadform{grid-template-columns:1fr}
+  .hero-img{object-position:74% 40%}
+  .plank{flex-basis:255px;min-height:390px}
 }
 </style>
 </head>
 <body>
-<div class="field"></div>
-<div class="grain"></div>
-
-<!-- the wire + orb -->
-<div id="wireLayer">
-  <svg id="wireSvg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-    <defs>
-      <linearGradient id="wireGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#7fe0ff"/>
-        <stop offset=".5" stop-color="#1fb6e8"/>
-        <stop offset="1" stop-color="#1fb6e8"/>
-      </linearGradient>
-    </defs>
-    <path id="wireGhost" d=""/>
-    <path id="wirePath" d=""/>
-  </svg>
-</div>
-<div id="orbLayer"><div id="orb"></div></div>
 
 <nav>
-  <a class="brand" href="#hero">
-    <span class="sq"><i></i><i></i><i></i><i></i></span>
-    <span><b>HIG</b><small>NATIONAL&nbsp;IMO</small></span>
-  </a>
-  <div class="navlinks">
-    <a href="#downline">Direct</a>
-    <a href="#why">The Sauce</a>
-    <a href="#services">Services</a>
+  <a class="brand" href="#hero">HIG<span>National IMO</span></a>
+  <div class="links">
+    <a href="#system">The System</a>
+    <a href="#numbers">Numbers</a>
+    <a href="#agents">Agents</a>
     <a href="#faq">FAQ</a>
-    <span id="linkPct">LINK 000%</span>
-    <a class="cta" href="mailto:info@higimo.com?subject=Get%20Contracted%20with%20HIG">Get Contracted</a>
   </div>
+  <a class="cta" href="#contact">Get Contracted</a>
 </nav>
 
 <main>
 
-<!-- ============ HERO ============ -->
+<!-- ============ HERO : amber sunset ============ -->
 <section id="hero">
-  <div class="hud" style="top:16vh;left:6vw"><b>EST. 25+ YEARS</b>FORT LAUDERDALE, FL</div>
-  <div class="hud" style="bottom:14vh;right:8vw;text-align:right"><b>PRODUCTS IN 49 STATES</b>NON-CAPTIVE // ALWAYS</div>
-
-  <p class="kick rev">National Insurance Marketing Organization</p>
-  <h1 class="rev">Linking <span class="hollow">Producer</span><br>to Markets</h1>
-  <p class="lede rev">HIG connects independent agents and agencies to the most expansive
-  consumer product offerings in the market — the contracts, the carriers, the back office.
-  You sell. You grow. <b style="color:var(--ink)">You stay independent.</b></p>
-  <div class="heroCtas rev">
-    <a class="cta" href="mailto:info@higimo.com?subject=Get%20Contracted%20with%20HIG">Get Contracted</a>
-    <a class="cta ghost" href="#why">Why HIG</a>
+  <img class="hero-img" src="img/hero-sunset.jpg" alt="Silhouette of an independent insurance agent walking a waterfront boardwalk against an amber Florida sunset" fetchpriority="high">
+  <div class="scrim"></div>
+  <div class="hero-inner">
+    <h1 class="rev">Linking producer to&nbsp;markets.</h1>
+    <p class="rev">HIG is the national IMO behind independent agents. The contracts, the carriers, the back office. You stay independent.</p>
+    <a class="cta rev" href="#contact">Get Contracted</a>
   </div>
+</section>
 
-  <div class="headset" data-wire data-x="0.78">
-    <svg viewBox="0 0 120 100" width="120" height="100" fill="none" stroke="#1fb6e8" stroke-width="2.5" stroke-linecap="round">
-      <path d="M18 62 V46 C18 24 37 8 60 8 C83 8 102 24 102 46 V62" stroke="#7fe0ff"/>
-      <rect x="8" y="56" width="20" height="30" rx="4" fill="#0a1018"/>
-      <rect x="92" y="56" width="20" height="30" rx="4" fill="#0a1018"/>
-      <path d="M92 86 C92 96 78 94 74 98" stroke-dasharray="2 5" opacity=".8"/>
+<!-- ============ BLUSH STATEMENT 1 ============ -->
+<section class="statement">
+  <p class="big rev">Imagine a career where every contract is written <em>directly with the carrier.</em> No hierarchy above you. No one skimming your commission.</p>
+</section>
+
+<!-- ============ BLACK WIREFRAME 1 : direct to carrier ============ -->
+<section class="wirepanel">
+  <div class="wf rev" aria-hidden="true">
+    <!-- hand-built wireframe: producer node linked straight to a horizon of carrier nodes -->
+    <svg viewBox="0 0 1200 560" fill="none" stroke="#efe6df" stroke-width="1">
+      <!-- perspective floor -->
+      <g opacity=".22">
+        <path d="M0 540 H1200"/><path d="M40 480 H1160"/><path d="M105 420 H1095"/>
+        <path d="M165 365 H1035"/><path d="M215 318 H985"/><path d="M255 280 H945"/><path d="M290 250 H910"/>
+        <path d="M0 560 L600 130"/><path d="M200 560 L600 130"/><path d="M400 560 L600 130"/>
+        <path d="M600 560 L600 130"/><path d="M800 560 L600 130"/><path d="M1000 560 L600 130"/><path d="M1200 560 L600 130"/>
+      </g>
+      <!-- carrier nodes on the horizon -->
+      <g opacity=".9">
+        <circle cx="240" cy="208" r="7"/><circle cx="390" cy="196" r="7"/><circle cx="530" cy="190" r="7"/>
+        <circle cx="670" cy="190" r="7"/><circle cx="810" cy="196" r="7"/><circle cx="960" cy="208" r="7"/>
+      </g>
+      <path d="M180 208 H120 M1020 208 H1080" opacity=".4"/>
+      <!-- direct lines: producer to every carrier, no intermediate node -->
+      <g opacity=".75">
+        <path d="M600 470 C560 380 330 280 240 215"/>
+        <path d="M600 470 C560 370 450 270 390 203"/>
+        <path d="M600 470 C580 370 545 260 530 197"/>
+        <path d="M600 470 C620 370 655 260 670 197"/>
+        <path d="M600 470 C640 370 750 270 810 203"/>
+        <path d="M600 470 C640 380 870 280 960 215"/>
+      </g>
+      <!-- producer node -->
+      <circle cx="600" cy="470" r="13" stroke-width="2"/>
+      <circle cx="600" cy="470" r="34" opacity=".35" stroke-dasharray="3 7"/>
+      <!-- labels -->
+      <g font-family="Hanken Grotesk, sans-serif" font-size="15" font-weight="600" fill="#a99e94" stroke="none" text-anchor="middle" letter-spacing="2">
+        <text x="600" y="535">YOU</text>
+        <text x="600" y="155">CARRIERS</text>
+      </g>
     </svg>
-    <div class="lbl">Producer<span>// you</span></div>
+  </div>
+  <h2 class="rev">Never a downline.</h2>
+  <p class="sub rev">Every HIG contract is written directly with the carrier. None of our contracts are captive: <b>your book, your renewals, your independence.</b></p>
+</section>
+
+<!-- ============ BLUSH STATS ============ -->
+<section id="numbers">
+  <div class="wrap">
+    <h2 class="rev">The terms most shops will not put in writing.</h2>
+    <div class="statgrid rev">
+      <div class="stat s1"><b>3-9<small> mo</small></b><span>Advanced commissions paid up front, from your first sale.</span></div>
+      <div class="stat s2"><b>$0</b><span>Advance fees. Cash flow without paying for the privilege.</span></div>
+      <div class="stat s3"><b>Level</b><span>Commissions on every product, with level renewals. Never declining.</span></div>
+      <div class="stat s4"><b>49</b><span>States with product availability. Non-captive, always.</span></div>
+    </div>
   </div>
 </section>
 
-<!-- ============ MARQUEE ============ -->
-<div class="marquee">
-  <div class="mtrack" id="mtrack">
-    <span>Direct Contracts — Never a Downline</span><span>Level Commissions Only</span><span>3–9 Month Advances</span><span>Zero Advance Fees</span><span>Products in 49 States</span><span>Non-Captive</span><span>Full Back Office</span>
+<!-- ============ BLACK WIREFRAME 2 : level always ============ -->
+<section class="wirepanel">
+  <div class="wf rev" aria-hidden="true">
+    <!-- hand-built wireframe chart: level commission line vs typical declining schedule -->
+    <svg viewBox="0 0 1200 480" fill="none">
+      <g stroke="#efe6df" opacity=".18" stroke-width="1">
+        <path d="M90 80 H1140"/><path d="M90 160 H1140"/><path d="M90 240 H1140"/><path d="M90 320 H1140"/>
+      </g>
+      <path d="M90 400 H1140" stroke="#efe6df" opacity=".5" stroke-width="1"/>
+      <!-- year ticks 1..9 -->
+      <g stroke="#efe6df" opacity=".4" stroke-width="1">
+        <path d="M140 400 v10"/><path d="M265 400 v10"/><path d="M390 400 v10"/><path d="M515 400 v10"/>
+        <path d="M640 400 v10"/><path d="M765 400 v10"/><path d="M890 400 v10"/><path d="M1015 400 v10"/><path d="M1140 400 v10"/>
+      </g>
+      <g font-family="Hanken Grotesk, sans-serif" font-size="14" font-weight="500" fill="#a99e94" text-anchor="middle">
+        <text x="140" y="438">YR 1</text><text x="390" y="438">YR 3</text><text x="640" y="438">YR 5</text><text x="890" y="438">YR 7</text><text x="1140" y="438">YR 9</text>
+      </g>
+      <!-- typical declining schedule -->
+      <path d="M140 120 C300 130 420 200 560 262 C700 324 900 352 1140 362" stroke="#efe6df" opacity=".35" stroke-width="2" stroke-dasharray="6 8"/>
+      <text x="1128" y="340" font-family="Hanken Grotesk, sans-serif" font-size="14" font-weight="500" fill="#a99e94" text-anchor="end">typical declining schedule</text>
+      <!-- HIG level line in the accent -->
+      <path d="M140 120 H1140" stroke="#d9e64f" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="140" cy="120" r="8" stroke="#d9e64f" stroke-width="3"/>
+      <circle cx="1140" cy="120" r="8" fill="#d9e64f"/>
+      <text x="1128" y="98" font-family="Hanken Grotesk, sans-serif" font-size="14" font-weight="600" fill="#d9e64f" text-anchor="end">HIG level commission</text>
+    </svg>
   </div>
-</div>
-
-<!-- ============ NEVER A DOWNLINE ============ -->
-<section id="downline" class="bigmoment">
-  <div class="wpt" data-wire data-x="0.22" style="top:30%"></div>
-  <div class="hud" style="top:18%;right:7vw;text-align:right"><b>CONTRACT TYPE</b>DIRECT WITH CARRIER</div>
-  <div class="hud" style="bottom:16%;right:14vw;text-align:right"><b>CAPTIVE</b>NO — YOUR BOOK STAYS YOURS</div>
-  <p class="kick rev">The HIG Difference</p>
-  <h2 class="rev">Never a<br><span class="cy">Downline.</span></h2>
-  <p class="lede rev">Every HIG contract is written <b style="color:var(--ink)">directly with the carrier</b>.
-  No hierarchy above you. No one skimming your commission. None of our contracts are captive —
-  you own your book, your renewals, your independence.</p>
+  <h2 class="rev">Level. Always.</h2>
+  <p class="sub rev">Not a single product on our platform has declining commissions, and renewals stay level for the length of membership. <b>Get paid in year nine like you did in year one.</b></p>
 </section>
 
-<!-- ============ SECRET SAUCE ============ -->
-<section id="why">
-  <div class="wpt" data-wire data-x="0.76" style="top:22%"></div>
-  <p class="kick rev">The Secret Sauce</p>
-  <h2 class="rev" style="font-size:clamp(40px,6.5vw,104px)">Everything upstream<br>of the sale — handled.</h2>
-  <p class="lede rev" style="margin-top:30px">The best competitive contracts with the highest independent
-  commissions in the nation, paired with marketing resources and large advances. Then end-to-end
-  insurance management — billing, fulfillment, administration, customer service. You focus on
-  production and growth. We handle the rest.</p>
-  <div class="stats rev">
-    <div class="stat"><b>3–9<em> MO</em></b><span>Advanced commissions paid up front</span></div>
-    <div class="stat"><b>$<em>0</em></b><span>Advance fees — ever</span></div>
-    <div class="stat"><b>LEVEL</b><span>Commissions — never declining, with level renewals</span></div>
-    <div class="stat"><b>49<em>+</em></b><span>States with product availability</span></div>
+<!-- ============ PLANKS : what the system includes ============ -->
+<section id="system">
+  <div class="head">
+    <h2 class="rev">Everything upstream of the sale, handled.</h2>
+    <p class="rev">The best competitive contracts and the highest independent commissions in the nation, then end-to-end insurance management. You focus on production and growth.</p>
   </div>
-</section>
-
-<!-- ============ SERVICES ============ -->
-<section id="services">
-  <div class="wpt" data-wire data-x="0.2" style="top:18%"></div>
-  <p class="kick rev">What You Get</p>
-  <h2 class="rev" style="font-size:clamp(40px,6.5vw,104px)">Support at every<br>stage of the career.</h2>
-  <div class="svc rev">
-    <div class="row"><span class="no">/ 01</span><h3>Top-Level Contracts</h3><p>Long-established carrier relationships unlock the most competitive contracts, benefits, income and offerings available in the industry.</p></div>
-    <div class="row"><span class="no">/ 02</span><h3>New Agent Training</h3><p>Good training is the foundation of the profession. Robust, in-depth product training across every sales and marketing resource — from day one.</p></div>
-    <div class="row"><span class="no">/ 03</span><h3>Veteran Agent Edge</h3><p>The marketplace never stops moving. We keep seasoned agents current with the latest tools and technology, backed by exceptional support.</p></div>
-    <div class="row"><span class="no">/ 04</span><h3>Agency Builders</h3><p>Recruit agents with a comprehensive portfolio of carriers, products and dedicated support — and consult directly with a founder who built his own agencies in just a few years.</p></div>
-    <div class="row"><span class="no">/ 05</span><h3>Full Back Office</h3><p>Billing, fulfillment, administration and customer service — end to end. Use our customer service team as your own and stay focused on production.</p></div>
-    <div class="row"><span class="no">/ 06</span><h3>No Hidden Fees</h3><p>No admin fees, no VABs, no mandated products on your enrollment platform. You control the consumer experience. What you see is what you get.</p></div>
+  <div class="planks rev">
+    <div class="plank p1"><span class="num">1</span><h3>Top-Level Contracts</h3><p>Long-established carrier relationships unlock the most competitive contracts, benefits, income and offerings in the industry.</p></div>
+    <div class="plank p2"><span class="num">2</span><h3>New Agent Training</h3><p>Robust, in-depth product training across every sales and marketing resource, from day one.</p></div>
+    <div class="plank p3"><span class="num">3</span><h3>Veteran Agent Edge</h3><p>The marketplace never stops moving. We keep seasoned agents current with the latest tools and technology.</p></div>
+    <div class="plank p4"><span class="num">4</span><h3>Agency Builders</h3><p>Recruit with a full portfolio of carriers and products, and consult directly with a founder who built his own agencies in just a few years.</p></div>
+    <div class="plank p5"><span class="num">5</span><h3>Full Back Office</h3><p>Billing, fulfillment, administration and customer service, end to end. Use our service team as your own.</p></div>
+    <div class="plank p6"><span class="num">6</span><h3>No Hidden Fees</h3><p>No admin fees, no VABs, no mandated products on your enrollment platform. What you see is what you get.</p></div>
   </div>
 </section>
 
-<!-- ============ LEVEL ALWAYS ============ -->
-<section class="bigmoment">
-  <div class="wpt" data-wire data-x="0.72" style="top:35%"></div>
-  <div class="hud" style="top:20%;left:6vw"><b>RENEWALS</b>LEVEL — LENGTH OF MEMBERSHIP</div>
-  <div class="hud" style="bottom:18%;left:13vw"><b>DECLINING PRODUCTS ON PLATFORM</b>ZERO</div>
-  <p class="kick rev" style="text-align:right">Commission Structure</p>
-  <h2 class="rev" style="text-align:right">Level.<br><span class="cy">Always.</span></h2>
-  <p class="lede rev" style="margin-left:auto;text-align:right">Not a single product on our platform has
-  declining commissions — and renewals stay level for the length of membership.
-  <b style="color:var(--ink)">Get paid in year nine like you did in year one.</b></p>
+<!-- ============ FOREST GREEN STATEMENT ============ -->
+<section id="os">
+  <p class="small rev">That's the</p>
+  <h2 class="rev">Agent Operating<br>System.</h2>
 </section>
 
-<!-- ============ QUOTES ============ -->
+<!-- ============ GIANT LOGOTYPE ============ -->
+<section id="mark">
+  <p class="tag rev">Linking Producer to Markets</p>
+  <div class="giant rev">HIG</div>
+</section>
+
+<!-- ============ QUOTE OVER NIGHT PHOTO ============ -->
 <section id="agents">
-  <div class="wpt" data-wire data-x="0.3" style="top:20%"></div>
-  <p class="kick rev">Our Agents</p>
-  <h2 class="rev" style="font-size:clamp(40px,6.5vw,104px)">Contracted &amp; growing.</h2>
-  <div class="quotes rev">
-    <div class="q"><p>This is not my first time in the industry — I've been selling insurance for seven years. I have experienced massive growth with HIG. You will actually walk away more successful.</p><span>Contracted Agent · 7 yrs in industry</span></div>
-    <div class="q"><p>I got licensed and consulted with HIG. They connected me with all of the best marketing programs — I've already tripled my income, and I'll be here a long time.</p><span>New Agent · First license</span></div>
-    <div class="q"><p>By far and away the greatest career. I was able to set my own schedule and become extremely successful in a short time. Wish I'd found this long ago.</p><span>Contracted Agent</span></div>
+  <img class="bg" src="img/night-city.jpg" alt="" role="presentation">
+  <div class="scrim"></div>
+  <div class="wrap">
+    <blockquote class="rev">"This is not my first time in the industry. I have experienced massive growth with HIG. You will actually walk away more successful."</blockquote>
+    <p class="who rev">Contracted Agent, 7 years in the industry</p>
+    <div class="quoterow rev">
+      <div><p>"They connected me with all of the best marketing programs. I've already tripled my income, and I'll be here a long time."</p><span>New Agent, first license</span></div>
+      <div><p>"By far and away the greatest career. I was able to set my own schedule and become extremely successful in a short time."</p><span>Contracted Agent</span></div>
+    </div>
   </div>
 </section>
 
 <!-- ============ FAQ ============ -->
 <section id="faq">
-  <div class="wpt" data-wire data-x="0.74" style="top:15%"></div>
-  <p class="kick rev">Straight Answers</p>
-  <h2 class="rev" style="font-size:clamp(40px,6.5vw,104px)">Asked &amp; answered.</h2>
-  <div class="faq rev">
-    <details><summary>Am I captive? <i>+</i></summary><p><b>No.</b> None of our contracts are captive. Your book is yours.</p></details>
-    <details><summary>Will I be a downline? <i>+</i></summary><p><b>No.</b> We contract you directly with the carrier. There is no hierarchy between you and your commission.</p></details>
-    <details><summary>Do you offer declining commissions? <i>+</i></summary><p><b>Never.</b> Level commissions only — on every product — with level renewals for the length of membership.</p></details>
-    <details><summary>How do advances work? <i>+</i></summary><p><b>3–9 month advanced commissions with zero advance fees.</b> Cash flow from your first sale, without paying for the privilege.</p></details>
-    <details><summary>What states do you do business in? <i>+</i></summary><p>We offer products in <b>49 states</b>.</p></details>
-    <details><summary>Are these the only plans HIG offers? <i>+</i></summary><p><b>No.</b> If there's a specific product you have in mind, let us know — we have access to most products in the market, and we can even build our own product if needed. We also offer non-insured ancillary products to maximize your members' savings.</p></details>
+  <div class="wrap">
+    <h2 class="rev">Asked and answered.</h2>
+    <div class="faqlist rev">
+      <details><summary>Am I captive? <i>+</i></summary><p><b>No.</b> None of our contracts are captive. Your book is yours.</p></details>
+      <details><summary>Will I be a downline? <i>+</i></summary><p><b>No.</b> We contract you directly with the carrier. There is no hierarchy between you and your commission.</p></details>
+      <details><summary>Do you offer declining commissions? <i>+</i></summary><p><b>Never.</b> Level commissions only, on every product, with level renewals for the length of membership.</p></details>
+      <details><summary>How do advances work? <i>+</i></summary><p><b>3-9 month advanced commissions with zero advance fees.</b> Cash flow from your first sale, without paying for the privilege.</p></details>
+      <details><summary>What states do you do business in? <i>+</i></summary><p>We offer products in <b>49 states</b>.</p></details>
+      <details><summary>Are these the only plans HIG offers? <i>+</i></summary><p><b>No.</b> We have access to most products in the market, and we can even build our own product if needed. We also offer non-insured ancillary products to maximize your members' savings.</p></details>
+    </div>
   </div>
 </section>
 
-<!-- ============ CONTACT ============ -->
+<!-- ============ CLOSING PHOTO BAND ============ -->
+<section id="horizon">
+  <img src="img/coast-aerial.jpg" alt="Aerial view of the Florida Atlantic coastline at golden hour">
+  <div class="scrim"></div>
+  <h2 class="rev">Your career.<br>Our operating system.</h2>
+</section>
+
+<!-- ============ CONTACT / LEAD FORM ============ -->
 <section id="contact">
-  <p class="kick rev" style="text-align:center">Producer → Markets</p>
-  <h2 class="rev">Plug <span class="cy">in.</span></h2>
-  <p class="lede rev">Gain the best competitive contracts, consulting, income and offerings in the
-  industry — plus a support system that treats agents like family.</p>
+  <div class="wrap">
+    <h2 class="rev">Plug in.</h2>
+    <p class="intro rev">Gain the best competitive contracts, consulting, income and offerings in the industry, plus a support system that treats agents like family.</p>
 
-  <div class="plug" data-wire data-x="0.5">
-    <svg viewBox="0 0 90 90" width="90" height="90" fill="none" stroke="#7fe0ff" stroke-width="2.5" stroke-linecap="round">
-      <path d="M45 2 V22" stroke-dasharray="2 5" opacity=".8"/>
-      <rect x="33" y="22" width="24" height="20" rx="3" fill="#0a1018" stroke="#1fb6e8"/>
-      <path d="M39 42 V54 M51 42 V54" stroke="#1fb6e8"/>
-      <rect x="22" y="54" width="46" height="26" rx="4" fill="#0a1018" stroke="#1fb6e8"/>
-      <circle cx="45" cy="67" r="4" fill="#1fb6e8" stroke="none"/>
-    </svg>
-    <div class="lbl">Markets</div>
-  </div>
-
-  <div class="cards rev">
-    <div class="card"><span>Email</span><b><a href="mailto:info@higimo.com">info@higimo.com</a></b></div>
-    <div class="card"><span>Office</span><b>Fort Lauderdale, FL</b></div>
-    <div class="card"><span>Hours</span><b>8:00 AM – 5:00 PM EST</b></div>
-  </div>
-  <form class="leadform rev" id="leadForm" novalidate>
-    <div class="field"><label for="lf-name">Full Name</label>
-      <input id="lf-name" name="name" type="text" autocomplete="name" required placeholder="Your name"></div>
-    <div class="field"><label for="lf-phone">Phone</label>
-      <input id="lf-phone" name="phone" type="tel" autocomplete="tel" required placeholder="(954) 000-0000"></div>
-    <div class="field"><label for="lf-email">Email</label>
-      <input id="lf-email" name="email" type="email" autocomplete="email" required placeholder="you@email.com"></div>
-    <div class="field"><label for="lf-lic">License</label>
-      <select id="lf-lic" name="license">
-        <option>2-15 Life &amp; Health</option>
-        <option>2-40 Health</option>
-        <option>2-14 Life</option>
-        <option>Agency owner</option>
-        <option>Licensed in another state</option>
-        <option>Not licensed yet</option>
-      </select></div>
-    <div class="field full"><label for="lf-msg">Anything else (optional)</label>
-      <textarea id="lf-msg" name="message" placeholder="Current carriers, what you're looking for…"></textarea></div>
-    <div class="submitrow">
-      <button class="cta" type="submit">Get Contracted Today</button>
-      <p class="formnote">Direct contracts · No fees to apply · Replies within one business day</p>
+    <div class="meta rev">
+      <div class="cell"><span>Email</span><b><a href="mailto:info@higimo.com">info@higimo.com</a></b></div>
+      <div class="cell"><span>Office</span><b>Fort Lauderdale, FL</b></div>
+      <div class="cell"><span>Hours</span><b>8:00 AM to 5:00 PM EST</b></div>
     </div>
-  </form>
+
+    <form class="leadform rev" id="leadForm" novalidate>
+      <div class="fcell"><label for="lf-name">Full Name</label>
+        <input id="lf-name" name="name" type="text" autocomplete="name" required placeholder="Your name"></div>
+      <div class="fcell"><label for="lf-phone">Phone</label>
+        <input id="lf-phone" name="phone" type="tel" autocomplete="tel" required placeholder="(954) 000-0000"></div>
+      <div class="fcell"><label for="lf-email">Email</label>
+        <input id="lf-email" name="email" type="email" autocomplete="email" required placeholder="you@email.com"></div>
+      <div class="fcell"><label for="lf-lic">License</label>
+        <select id="lf-lic" name="license">
+          <option>2-15 Life &amp; Health</option>
+          <option>2-40 Health</option>
+          <option>2-14 Life</option>
+          <option>Agency owner</option>
+          <option>Licensed in another state</option>
+          <option>Not licensed yet</option>
+        </select></div>
+      <div class="fcell full"><label for="lf-msg">Anything else (optional)</label>
+        <textarea id="lf-msg" name="message" placeholder="Current carriers, what you're looking for…"></textarea></div>
+      <div class="submitrow">
+        <button class="cta" type="submit">Get Contracted</button>
+        <p class="note">Direct contracts. No fees to apply. Replies within one business day.</p>
+      </div>
+    </form>
+  </div>
 </section>
 
 </main>
 
 <footer>
-  <p><b>HIG</b> — Linking Producer to Markets</p>
-  <p>National Insurance Marketing Organization · Fort Lauderdale, FL</p>
-  <p>© 2026 HIG. All rights reserved.</p>
+  <div class="row">
+    <p><b>HIG</b><br>Linking Producer to Markets</p>
+    <p>National Insurance Marketing Organization<br>Fort Lauderdale, FL</p>
+    <p>© 2026 HIG.<br>All rights reserved.</p>
+  </div>
+  <p class="disclaimer">Concept demo. An unofficial design exploration built for HIG (higimo.com). Not the live HIG website, and not an offer of contracting terms.</p>
 </footer>
 
 <script>
 (function(){
   "use strict";
-  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var layer = document.getElementById('wireLayer'),
-      svg   = document.getElementById('wireSvg'),
-      path  = document.getElementById('wirePath'),
-      ghost = document.getElementById('wireGhost'),
-      orb   = document.getElementById('orb'),
-      pct   = document.getElementById('linkPct');
-  var len = 0, cur = 0, target = 0, built = false;
-
-  // marquee: duplicate track content so -50% loop is seamless
-  var mt = document.getElementById('mtrack');
-  mt.innerHTML += mt.innerHTML;
-
-  function anchors(){
-    var pts = [];
-    document.querySelectorAll('[data-wire]').forEach(function(el){
-      var r = el.getBoundingClientRect();
-      var y = r.top + r.height/2 + window.scrollY;
-      var fx = parseFloat(el.getAttribute('data-x') || '0.5');
-      var x;
-      if (el.classList.contains('headset') || el.classList.contains('plug')) {
-        x = r.left + r.width/2;                 // wire meets the icon itself
-        if (el.classList.contains('headset')) y = r.top + r.height + window.scrollY;
-        if (el.classList.contains('plug'))    y = r.top + window.scrollY;
-      } else {
-        x = fx * window.innerWidth;
-      }
-      pts.push({x:x, y:y});
-    });
-    pts.sort(function(a,b){ return a.y - b.y; });
-    return pts;
-  }
-
-  function build(){
-    var H = document.body.scrollHeight, W = window.innerWidth;
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    svg.setAttribute('width', W); svg.setAttribute('height', H);
-    var p = anchors();
-    if (p.length < 2) return;
-    var d = 'M ' + p[0].x + ' ' + p[0].y;
-    for (var i = 1; i < p.length; i++){
-      var a = p[i-1], b = p[i], my = (a.y + b.y) / 2;
-      d += ' C ' + a.x + ' ' + my + ', ' + b.x + ' ' + my + ', ' + b.x + ' ' + b.y;
-    }
-    path.setAttribute('d', d); ghost.setAttribute('d', d);
-    len = path.getTotalLength();
-    path.style.strokeDasharray = len;
-    path.style.strokeDashoffset = len;
-    built = true;
-    onScroll();
-    if (reduce){ cur = target; render(); }
-  }
-
-  function onScroll(){
-    var max = document.body.scrollHeight - window.innerHeight;
-    var prog = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-    target = prog * len;
-    pct.textContent = 'LINK ' + String(Math.round(prog * 100)).padStart(3,'0') + '%';
-  }
-
-  function render(){
-    if (!built) return;
-    path.style.strokeDashoffset = Math.max(0, len - cur);
-    var pt = path.getPointAtLength(Math.max(0, Math.min(len, cur)));
-    orb.style.transform = 'translate(' + pt.x + 'px,' + pt.y + 'px)';
-  }
-
-  function tick(){
-    cur += (target - cur) * (reduce ? 1 : 0.085);
-    if (Math.abs(target - cur) < .1) cur = target;
-    render();
-    requestAnimationFrame(tick);
-  }
-
-  var rT;
-  window.addEventListener('resize', function(){ clearTimeout(rT); rT = setTimeout(build, 180); });
-  window.addEventListener('scroll', onScroll, {passive:true});
-
-  // reveal on scroll
+  // reveal on scroll (IntersectionObserver only; honors prefers-reduced-motion via CSS)
   var io = new IntersectionObserver(function(es){
     es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); } });
   }, {threshold:.12});
   document.querySelectorAll('.rev').forEach(function(el){ io.observe(el); });
-
-  window.addEventListener('load', build);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(build, 60); });
-  build();
-  tick();
 })();
 </script>
 <script>
-// Lead capture — zero-backend demo mode: submits open a fully prefilled email
+// Lead capture, zero-backend demo mode: submits open a fully prefilled email
 // to info@higimo.com. Swap the handler for Mike's GHL (leadconnectorhq) form
 // endpoint when this goes live.
 (function(){
